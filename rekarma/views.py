@@ -19,9 +19,11 @@ def rekarma():
         # Not in cache, this response will take > 3000ms. Using Slack delayed response
         # See: https://api.slack.com/slash-commands#responding_to_a_command
         response_url = request.values.get('response_url')
+
         queue = Queue(connection=redis_server)
         job = queue.enqueue(send_delayed_response, response_url)
-        return Response(u'Processing your request...',
+
+        return Response(u'Karma? OK, give me a second...',
                         content_type='text/plain; charset=utf-8')
     else:
         return Response(get_rekarma_text(), content_type='text/plain; charset=utf-8')

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
 import datetime
 import time
 from collections import defaultdict
 from itertools import chain
 
-from flask import Flask, request, Response
 from slacker import Slacker
 import redis
 
@@ -71,10 +72,9 @@ def get_rekarma(slack_api_key=None, message_max_days=None):
     ]
 
 
-redis_server = redis.from_url(os.environ.get("REDIS_URL"))
-
 
 def get_rekarma_text():
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"))
     if not redis_server.get('rekarma:cache:text'):
         rekarma = get_rekarma()
         rekarma_text = '\n'.join(chain(
@@ -86,16 +86,3 @@ def get_rekarma_text():
         redis_server.set('rekarma:cache:text', rekarma_text)
         redis_server.expire('rekarma:cache:text', DEFAULT_RESPONSE_CACHE_TTL)
     return redis_server.get('rekarma:cache:text')
-
-
-app = Flask(__name__)
-
-
-@app.route('/rekarma', methods=['GET'])
-def rekarma():
-    text = request.values.get('text')
-    return Response(get_rekarma_text(), content_type='text/plain; charset=utf-8')
-
-
-if __name__ == '__main__':
-    app.run()

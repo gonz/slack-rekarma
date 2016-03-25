@@ -7,6 +7,7 @@ from itertools import chain
 
 from flask import Flask, request, Response
 from slacker import Slacker
+import redis
 
 
 # TODO: Make this configurable to include custom emojis and define better defaults
@@ -21,6 +22,8 @@ CUSTOM_REACTION_KARMA = {
     '-1': -2,
     'broken_heart': -1,
 }
+
+DEFAULT_RESPONSE_CACHE_TTL = 60 * 5
 
 
 def get_reaction_karma(reaction_name):
@@ -68,6 +71,22 @@ def get_rekarma(slack_api_key=None, message_max_days=None):
     ]
 
 
+redis_server = redis.from_url(os.environ.get("REDIS_URL"))
+
+
+def get_rekarma_text():
+    if not redis_server.get('rekarma:cache:text'):
+        rekarma = get_rekarma()
+        rekarma_text = '\n'.join(chain(
+            ['Karma for all users:'],
+            ('  #{i} *{username}* {rekarma} points reactions: '.format(i=i + 1, **r) +
+             ' '.join([':{}:'.format(name) for name in r['reactions']])
+             for i, r in enumerate(sorted(rekarma, reverse=True, key=lambda x: x['rekarma'])))
+        ))
+        redis_server.set('rekarma:cache:text', rekarma_text)
+        redis_server.expire('rekarma:cache:text', DEFAULT_RESPONSE_CACHE_TTL)
+    return redis_server.get('rekarma:cache:text')
+
 
 app = Flask(__name__)
 
@@ -75,17 +94,7 @@ app = Flask(__name__)
 @app.route('/rekarma', methods=['GET'])
 def rekarma():
     text = request.values.get('text')
-
-    rekarma = get_rekarma()
-
-    response_body = '\n'.join(chain(
-        ['Karma for all users:'],
-        ('  #{i} *{username}* {rekarma} points reactions: '.format(i=i + 1, **r) +
-         ' '.join([':{}:'.format(name) for name in r['reactions']])
-         for i, r in enumerate(sorted(rekarma, reverse=True, key=lambda x: x['rekarma'])))
-    ))
-
-    return Response(response_body, content_type='text/plain; charset=utf-8')
+    return Response(get_rekarma_text(), content_type='text/plain; charset=utf-8')
 
 
 if __name__ == '__main__':

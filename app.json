@@ -1,0 +1,11 @@
+{
+    "name": "Rekarma",
+    "description": "Slack raction based karma",
+    "keywords": [
+        "slack",
+        "flask",
+        "python",
+        "web"
+    ],
+    "repository": "https://github.com/gonz/rekarma"
+}

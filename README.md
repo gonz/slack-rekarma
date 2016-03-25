@@ -8,11 +8,12 @@ From a slack channel type `/rekarma`. The full user karma list will be shown inl
 
 ## Integration
 
-1. Go to your channel
-2. Click on **Configure Integrations**.
-3. Scroll all the way down to **DIY Integrations & Customizations section**.
-4. Click on **Add** next to **Slash Commands**.
+1. Go to **Apps and Integrations**.
+2. Click on the to right button **Build your own**.
+3. Click on **Make a custom integration**
+4. Click on **Slash Commands**.
   - Command: `/rekarma`
+5. Update the following info:
   - URL: `http://YOUR-DOMAIN/rekarma`
   - Method: `GET`
 

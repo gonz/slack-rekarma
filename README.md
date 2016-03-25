@@ -25,13 +25,18 @@ $ pip install -r requirements.txt
 
 # Set environment variables
 $ export SREK_SLAK_API_KEY="YOUR-SLACK-API-KEY-HERE"
+$ export REDIS_URL="YOUR-REDIS-URL"
 
-# Start the server
-$ python app.py
+# Start the flask web server
+$ python runserver.py
+
+# Start the rq worker
+$ python worker.py
 ```
 
 ## Deploy to Heroku
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-Remember to set the `SREK_SLAK_API_KEY` environment variable in your heroku app [using the heroku cli](https://devcenter.heroku.com/articles/config-vars#setting-up-config-vars-for-a-deployed-application).
+ * Remember to set the `SREK_SLAK_API_KEY` environment variable in your heroku app [using the heroku cli](https://devcenter.heroku.com/articles/config-vars#setting-up-config-vars-for-a-deployed-application).
+ * You will also need to [install and enable a redis addon](https://devcenter.heroku.com/articles/heroku-redis)

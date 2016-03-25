@@ -8,7 +8,8 @@ from collections import defaultdict
 from itertools import chain
 
 from slacker import Slacker
-import redis
+
+from rekarma import redis_server
 
 
 # TODO: Make this configurable to include custom emojis and define better defaults
@@ -74,7 +75,6 @@ def get_rekarma(slack_api_key=None, message_max_days=None):
 
 
 def get_rekarma_text():
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"))
     if not redis_server.get('rekarma:cache:text'):
         rekarma = get_rekarma()
         rekarma_text = '\n'.join(chain(

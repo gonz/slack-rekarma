@@ -4,17 +4,15 @@ from __future__ import absolute_import
 import os
 
 from flask import Flask, request, Response
-import redis
 from rq import Queue
 
-from rekarma import app
+from rekarma import app, redis_server
 from rekarma.jobs import send_delayed_response
 from rekarma.slack import get_rekarma_text
 
 
 @app.route('/rekarma', methods=['GET'])
 def rekarma():
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"))
     if not redis_server.get('rekarma:cache:text'):
         # Not in cache, this response will take > 3000ms. Using Slack delayed response
         # See: https://api.slack.com/slash-commands#responding_to_a_command
